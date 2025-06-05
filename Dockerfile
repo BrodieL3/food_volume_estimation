@@ -15,8 +15,8 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
-# The Flask app runs on port 5000
-EXPOSE 5000
+# The Flask app runs on port 8080
+EXPOSE 8080
 
 CMD ["python", "food_volume_estimation_app.py"]
 
