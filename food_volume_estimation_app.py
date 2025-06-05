@@ -145,5 +145,6 @@ if __name__ == '__main__':
                           args.depth_model_weights, 
                           args.segmentation_model_weights,
                           args.density_db_source)
-    app.run(host='0.0.0.0')
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
 
