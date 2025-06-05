@@ -1,24 +1,22 @@
-FROM python:3.6
+# Use Python 3.7 for compatibility with Pandas 0.24.2 and TF 1.x
+FROM python:3.7-slim
 
-# Install dependencies
+# Prevents warnings from pip
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Install food-volume-estimation package
-ADD food_volume_estimation/ food_volume_estimation/
-copy setup.py .
-RUN python setup.py install
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-# Add model files to image
-COPY models/fine_tune_food_videos/monovideo_fine_tune_food_videos.json models/depth_architecture.json
-COPY models/fine_tune_food_videos/monovideo_fine_tune_food_videos.h5 models/depth_weights.h5
-COPY models/segmentation/mask_rcnn_food_segmentation.h5 models/segmentation_weights.h5
+COPY . .
 
-# Copy and execute server script
-COPY food_volume_estimation_app.py .
-ENTRYPOINT ["python", "food_volume_estimation_app.py", \
-            "--depth_model_architecture", "models/depth_architecture.json", \
-            "--depth_model_weights", "models/depth_weights.h5", \
-            "--segmentation_model_weights", "models/segmentation_weights.h5", \
-            "--density_db_source"]
+# The Flask app runs on port 5000
+EXPOSE 5000
+
+CMD ["python", "food_volume_estimation_app.py"]
 
